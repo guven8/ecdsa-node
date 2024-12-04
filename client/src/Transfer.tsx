@@ -3,16 +3,19 @@ import server from "./server";
 
 type P = {
   address: string;
+  signature: string;
   setBalance: (balance: number) => void;
 };
 
-function Transfer({ address, setBalance }: P) {
+function Transfer({ address, setBalance, signature }: P) {
   const [sendAmount, setSendAmount] = useState("");
   const [recipient, setRecipient] = useState("");
 
   async function transfer(evt: React.FormEvent<HTMLFormElement>) {
     evt.preventDefault();
-
+    if (!signature) {
+      return alert("No Signature!");
+    }
     try {
       const {
         data: { balance },
@@ -20,6 +23,7 @@ function Transfer({ address, setBalance }: P) {
         sender: address,
         amount: parseInt(sendAmount),
         recipient,
+        signature,
       });
       console.log(balance);
       setBalance(balance);

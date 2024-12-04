@@ -8,6 +8,8 @@ type P = {
   setAddress: (addr: string) => void;
   balance: number;
   setBalance: (balance: number) => void;
+  signature: string;
+  setSignature: (sig: string) => void;
 };
 
 export default function Signature({
@@ -15,8 +17,9 @@ export default function Signature({
   setAddress,
   balance,
   setBalance,
+  signature,
+  setSignature,
 }: P) {
-  const [signature, setSignature] = useState("");
   const [recoveryBit, setRecoveryBit] = useState("");
 
   const getBalanceFromAddress = async (address: string) => {

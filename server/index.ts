@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import hashMessage from "./scripts/hashMessage";
+import { toHex } from "ethereum-cryptography/utils";
 const app = express();
 const port = 3042;
 
@@ -12,6 +14,8 @@ const balances: any = {
   "0x629a7571cc5a621e7cacae89e4886a143886a264": 75,
 };
 
+const usedSignatures: string[] = [];
+
 app.get("/balance/:address", (req, res) => {
   const { address } = req.params;
   const balance = balances[address] || 0;
@@ -19,18 +23,22 @@ app.get("/balance/:address", (req, res) => {
 });
 
 app.post("/send", (req, res) => {
-  const { sender, recipient, amount } = req.body;
+  const { sender, recipient, amount, signature } = req.body;
 
   setInitialBalance(sender);
   setInitialBalance(recipient);
-  console.log(sender, recipient);
-  if (sender === recipient) {
+  const sigHash = toHex(hashMessage(signature));
+
+  if (usedSignatures.indexOf(sigHash) !== -1) {
+    res.status(400).send({ message: "Signature has been used!" });
+  } else if (sender === recipient) {
     res.status(400).send({ message: "Cannot send funds to yourself!" });
   } else if (balances[sender] < amount) {
     res.status(400).send({ message: "Not enough funds!" });
   } else {
     balances[sender] -= amount;
     balances[recipient] += amount;
+    usedSignatures.push(sigHash);
     res.send({ balance: balances[sender] });
   }
 });
