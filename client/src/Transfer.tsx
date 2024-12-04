@@ -1,13 +1,16 @@
 import { useState } from "react";
 import server from "./server";
 
-function Transfer({ address, setBalance }) {
+type P = {
+  address: string;
+  setBalance: (balance: number) => void;
+};
+
+function Transfer({ address, setBalance }: P) {
   const [sendAmount, setSendAmount] = useState("");
   const [recipient, setRecipient] = useState("");
 
-  const setValue = (setter) => (evt) => setter(evt.target.value);
-
-  async function transfer(evt) {
+  async function transfer(evt: React.FormEvent<HTMLFormElement>) {
     evt.preventDefault();
 
     try {
@@ -18,8 +21,9 @@ function Transfer({ address, setBalance }) {
         amount: parseInt(sendAmount),
         recipient,
       });
+      console.log(balance);
       setBalance(balance);
-    } catch (ex) {
+    } catch (ex: any) {
       alert(ex.response.data.message);
     }
   }
@@ -33,7 +37,7 @@ function Transfer({ address, setBalance }) {
         <input
           placeholder="1, 2, 3..."
           value={sendAmount}
-          onChange={setValue(setSendAmount)}
+          onChange={(e) => setSendAmount(e.target.value)}
         ></input>
       </label>
 
@@ -42,7 +46,7 @@ function Transfer({ address, setBalance }) {
         <input
           placeholder="Type an address, for example: 0x2"
           value={recipient}
-          onChange={setValue(setRecipient)}
+          onChange={(e) => setRecipient(e.target.value)}
         ></input>
       </label>
 
